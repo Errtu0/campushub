@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+{% block title %}Events — CampusHub{% endblock %}
+{% block content %}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <span class="page-title">Campus Events</span>
+  {% if user.is_authenticated and user.role == 'club_manager' or user.is_authenticated and user.role == 'admin' %}
+  <a href="{% url 'event_create' %}" class="btn btn-primary px-4">New Event</a>
+  {% endif %}
+</div>
+
+<form method="get" class="mb-4">
+  <div class="input-group" style="max-width:420px;">
+    <input type="text" name="q" class="form-control" placeholder="Search events..." value="{{ query|default:'' }}">
+    <button type="submit" class="btn btn-outline-secondary px-3"><i class="bi bi-search"></i></button>
+    {% if query %}
+    <a href="{% url 'event_list' %}" class="btn btn-outline-secondary">Clear</a>
+    {% endif %}
+  </div>
+</form>
+
+<div class="row g-4">
+  {% for event in events %}
+  <div class="col-md-4">
+    <div class="card h-100 shadow-sm border-0">
+      <div class="card-body d-flex flex-column">
+        <div class="d-flex justify-content-between align-items-start mb-2">
+          <span class="badge {% if event.is_full %}bg-danger{% else %}bg-success{% endif %}">
+            {% if event.is_full %}Full{% else %}{{ event.spots_left }} spots left{% endif %}
+          </span>
+          <small class="text-muted">{{ event.date|date:"M d" }}</small>
+        </div>
+        <h6 class="fw-semibold mb-1">{{ event.title }}</h6>
+        <p class="text-muted small flex-grow-1">{{ event.description|truncatechars:80 }}</p>
+        <div class="text-muted small mt-2">
+          <div class="mb-1">{{ event.club.name }}</div>
+          <div class="mb-1"><i class="bi bi-geo-alt me-1"></i>{{ event.location }}</div>
+          <div><i class="bi bi-people me-1"></i>{{ event.participant_count }}/{{ event.max_participants }}</div>
+        </div>
+      </div>
+      <div class="card-footer border-0 bg-transparent pt-0 pb-3 px-3">
+        <a href="{% url 'event_detail' event.pk %}" class="btn btn-outline-primary btn-sm w-100">View Details</a>
+      </div>
+    </div>
+  </div>
+  {% empty %}
+  <div class="col">
+    <p class="text-muted">No events found{% if query %} for "{{ query }}"{% endif %}.</p>
+  </div>
+  {% endfor %}
+</div>
+
+{% if events.has_other_pages %}
+<nav class="mt-4">
+  <ul class="pagination justify-content-center">
+    {% if events.has_previous %}
+    <li class="page-item">
+      <a class="page-link" href="?{% if query %}q={{ query }}&{% endif %}page={{ events.previous_page_number }}">Previous</a>
+    </li>
+    {% endif %}
+    <li class="page-item active">
+      <span class="page-link">{{ events.number }} / {{ events.paginator.num_pages }}</span>
+    </li>
+    {% if events.has_next %}
+    <li class="page-item">
+      <a class="page-link" href="?{% if query %}q={{ query }}&{% endif %}page={{ events.next_page_number }}">Next</a>
+    </li>
+    {% endif %}
+  </ul>
+</nav>
+{% endif %}
+
+{% endblock %}

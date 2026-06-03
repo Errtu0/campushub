@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% block title %}{{ action }} Club - CampusHub{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-7">
+    <div class="card shadow-sm border-0">
+      <div class="card-body p-4">
+        <h3 class="mb-4"><i class="bi bi-people-fill me-2 text-primary"></i>{{ action }} Club</h3>
+        <form method="post" enctype="multipart/form-data">
+          {% csrf_token %}
+          {% for field in form %}
+          <div class="mb-3">
+            <label class="form-label fw-semibold">{{ field.label }}</label>
+            {{ field }}
+            {% if field.errors %}{% for error in field.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}{% endif %}
+          </div>
+          {% endfor %}
+          {% if action == 'Create' %}
+          <div class="alert alert-info small"><i class="bi bi-info-circle me-1"></i>Your club will be reviewed by an admin before being visible to other students.</div>
+          {% endif %}
+          <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-primary">{{ action }} Club</button>
+            <a href="{% if club %}{% url 'club_detail' club.pk %}{% else %}{% url 'club_list' %}{% endif %}" class="btn btn-outline-secondary">Cancel</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

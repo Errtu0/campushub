@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% block title %}Manage Users - Admin{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h3><i class="bi bi-people-fill me-2 text-primary"></i>User Management</h3>
+</div>
+<div class="card shadow-sm border-0">
+  <div class="card-body p-0">
+    <table class="table table-hover mb-0">
+      <thead class="table-dark">
+        <tr><th>Username</th><th>Name</th><th>Email</th><th>Role</th><th>Joined</th><th>Actions</th></tr>
+      </thead>
+      <tbody>
+        {% for u in users %}
+        <tr>
+          <td>{{ u.username }}</td>
+          <td>{{ u.get_full_name|default:"-" }}</td>
+          <td>{{ u.email }}</td>
+          <td><span class="badge bg-{% if u.role == 'admin' %}danger{% elif u.role == 'club_manager' %}warning text-dark{% else %}primary{% endif %}">{{ u.get_role_display }}</span></td>
+          <td>{{ u.date_joined|date:"M d, Y" }}</td>
+          <td>
+            <a href="{% url 'admin_user_edit' u.pk %}" class="btn btn-sm btn-outline-primary"><i class="bi bi-pencil"></i></a>
+            {% if u != request.user %}
+            <a href="{% url 'admin_user_delete' u.pk %}" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></a>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

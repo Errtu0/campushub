@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+{% block title %}Club Approvals - Admin{% endblock %}
+{% block content %}
+<h3 class="mb-4"><i class="bi bi-shield-check me-2 text-primary"></i>Club Approval Dashboard</h3>
+
+{% if pending_clubs %}
+<div class="card shadow-sm border-0 mb-4">
+  <div class="card-header bg-warning"><strong><i class="bi bi-hourglass me-2"></i>Pending Approval ({{ pending_clubs.count }})</strong></div>
+  <div class="card-body p-0">
+    <table class="table table-hover mb-0">
+      <thead class="table-light"><tr><th>Club</th><th>Manager</th><th>Submitted</th><th>Actions</th></tr></thead>
+      <tbody>
+        {% for club in pending_clubs %}
+        <tr>
+          <td><a href="{% url 'club_detail' club.pk %}">{{ club.name }}</a></td>
+          <td>{{ club.manager.username }}</td>
+          <td>{{ club.created_at|date:"M d, Y" }}</td>
+          <td>
+            <form method="post" action="{% url 'admin_club_approve' club.pk %}" class="d-inline">
+              {% csrf_token %}
+              <button name="action" value="approve" class="btn btn-sm btn-success me-1"><i class="bi bi-check2"></i> Approve</button>
+              <button name="action" value="reject" class="btn btn-sm btn-danger"><i class="bi bi-x"></i> Reject</button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% else %}
+<div class="alert alert-success"><i class="bi bi-check-circle me-2"></i>No clubs pending approval.</div>
+{% endif %}
+
+<div class="card shadow-sm border-0">
+  <div class="card-header"><strong>All Clubs</strong></div>
+  <div class="card-body p-0">
+    <table class="table table-hover mb-0">
+      <thead class="table-light"><tr><th>Club</th><th>Manager</th><th>Status</th><th>Members</th><th>Actions</th></tr></thead>
+      <tbody>
+        {% for club in all_clubs %}
+        <tr>
+          <td><a href="{% url 'club_detail' club.pk %}">{{ club.name }}</a></td>
+          <td>{{ club.manager.username }}</td>
+          <td><span class="badge bg-{% if club.status == 'approved' %}success{% elif club.status == 'pending' %}warning text-dark{% else %}danger{% endif %}">{{ club.get_status_display }}</span></td>
+          <td>{{ club.member_count }}</td>
+          <td>
+            <a href="{% url 'club_edit' club.pk %}" class="btn btn-sm btn-outline-primary"><i class="bi bi-pencil"></i></a>
+            <a href="{% url 'admin_club_delete' club.pk %}" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

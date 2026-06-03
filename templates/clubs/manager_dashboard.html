@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+{% block title %}Dashboard — CampusHub{% endblock %}
+{% block content %}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <span class="page-title">Dashboard</span>
+  <a href="{% url 'club_create' %}" class="btn btn-primary px-4">New Club</a>
+</div>
+
+{% for club in clubs %}
+<div class="card shadow-sm border-0 mb-4">
+  <div class="card-body p-4">
+    <div class="d-flex justify-content-between align-items-start mb-3">
+      <div>
+        <h6 class="fw-semibold mb-1">
+          {{ club.name }}
+          <span class="badge ms-2 {% if club.status == 'approved' %}bg-success{% elif club.status == 'pending' %}bg-warning text-dark{% else %}bg-danger{% endif %}" style="font-size:0.7rem;">
+            {{ club.get_status_display }}
+          </span>
+        </h6>
+        <span class="text-muted small">{{ club.member_count }} member{{ club.member_count|pluralize }} &bull; {{ club.events.count }} event{{ club.events.count|pluralize }}</span>
+      </div>
+      <div class="d-flex gap-2">
+        <a href="{% url 'club_edit' club.pk %}" class="btn btn-sm btn-outline-secondary">Edit</a>
+        <a href="{% url 'event_create' %}" class="btn btn-sm btn-primary">New Event</a>
+      </div>
+    </div>
+
+    {% if club.events.all %}
+    <div class="border-top pt-3">
+      {% for event in club.events.all %}
+      <div class="d-flex justify-content-between align-items-center py-2 {% if not forloop.last %}border-bottom{% endif %}">
+        <div>
+          <a href="{% url 'event_detail' event.pk %}" class="text-decoration-none text-dark fw-semibold small">{{ event.title }}</a>
+          <div class="text-muted" style="font-size:0.78rem;">{{ event.date|date:"M d, Y H:i" }} &bull; {{ event.participant_count }}/{{ event.max_participants }}</div>
+        </div>
+        <div class="d-flex gap-1">
+          <a href="{% url 'event_edit' event.pk %}" class="btn btn-sm btn-outline-secondary py-1 px-2"><i class="bi bi-pencil"></i></a>
+          <a href="{% url 'event_delete' event.pk %}" class="btn btn-sm btn-outline-danger py-1 px-2"><i class="bi bi-trash"></i></a>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <p class="text-muted small mt-2 mb-0">No events yet. <a href="{% url 'event_create' %}" class="text-decoration-none">Create one.</a></p>
+    {% endif %}
+  </div>
+</div>
+{% empty %}
+<div class="card shadow-sm border-0">
+  <div class="card-body p-4 text-center">
+    <p class="text-muted mb-3">You don't manage any clubs yet.</p>
+    <a href="{% url 'club_create' %}" class="btn btn-primary px-4">Create a Club</a>
+  </div>
+</div>
+{% endfor %}
+
+{% endblock %}

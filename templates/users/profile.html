@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+{% block title %}{{ profile_user.get_full_name|default:profile_user.username }} — CampusHub{% endblock %}
+{% block content %}
+
+<div class="row g-4">
+  <div class="col-md-3">
+    <div class="card shadow-sm border-0 text-center p-4">
+      {% if profile_user.profile_picture %}
+      <img src="{{ profile_user.profile_picture.url }}" class="rounded-circle mx-auto mb-3" width="100" height="100" style="object-fit:cover;">
+      {% else %}
+      <div class="rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3"
+           style="width:100px;height:100px;background:#1a1a2e;">
+        <i class="bi bi-person-fill text-white" style="font-size:2.2rem;opacity:0.6;"></i>
+      </div>
+      {% endif %}
+      <h6 class="fw-semibold mb-1">{{ profile_user.get_full_name|default:profile_user.username }}</h6>
+      <span class="badge bg-secondary mb-2" style="font-size:0.72rem;">{{ profile_user.get_role_display }}</span>
+      {% if profile_user.student_id %}
+      <p class="text-muted small mb-0">{{ profile_user.student_id }}</p>
+      {% endif %}
+      {% if profile_user == request.user %}
+      <a href="{% url 'profile_edit' %}" class="btn btn-outline-secondary btn-sm mt-3">Edit Profile</a>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="col-md-9">
+    {% if profile_user.bio %}
+    <div class="card shadow-sm border-0 mb-3">
+      <div class="card-body">
+        <h6 class="fw-semibold mb-2">About</h6>
+        <p class="text-muted mb-0" style="line-height:1.7;">{{ profile_user.bio }}</p>
+      </div>
+    </div>
+    {% endif %}
+
+    <div class="card shadow-sm border-0 mb-3">
+      <div class="card-body">
+        <h6 class="fw-semibold mb-3">Account Info</h6>
+        <table class="table table-borderless table-sm mb-0 text-muted small">
+          <tr><th style="width:130px;color:#1a1a2e;">Username</th><td>{{ profile_user.username }}</td></tr>
+          <tr><th style="color:#1a1a2e;">Email</th><td>{{ profile_user.email }}</td></tr>
+          <tr><th style="color:#1a1a2e;">Member since</th><td>{{ profile_user.date_joined|date:"F j, Y" }}</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="card shadow-sm border-0">
+      <div class="card-body">
+        <h6 class="fw-semibold mb-3">Clubs</h6>
+        <div class="d-flex flex-wrap gap-2">
+          {% for club in profile_user.joined_clubs.all %}
+          <a href="{% url 'club_detail' club.pk %}" class="badge bg-light text-dark text-decoration-none border">{{ club.name }}</a>
+          {% empty %}
+          <p class="text-muted small mb-0">Not a member of any clubs yet.</p>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
