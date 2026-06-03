@@ -33,7 +33,7 @@ cd campus_event_system
 ### 2. Create virtual environment
 
 ```bash
-python -m venv venv
+py -3.12 -m venv myenv
 source venv/bin/activate        # Linux/macOS
 venv\Scripts\activate           # Windows
 ```
